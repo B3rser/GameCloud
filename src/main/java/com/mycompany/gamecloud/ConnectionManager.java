@@ -1,29 +1,46 @@
 package com.mycompany.gamecloud;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import org.json.JSONObject;
+
+import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.Scanner;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 public class ConnectionManager implements Runnable {
 
-    private static Socket socket;
-    private static DataInputStream dis;
-    private static DataOutputStream dos;
-    private static Thread senderThread;
-    private static Thread receiverThread;
-    private static Scanner scanner;
-    private static String username;
+    private final String serverIP;
+    private final int serverPort;
+    private Socket socket;
+    private DataInputStream dis;
+    private DataOutputStream dos;
+    private String username;
 
-    public static void receiver() {
+    private Thread senderThread;
+    private Thread receiverThread;
+
+    private final ConcurrentLinkedQueue<JSONObject> incomingQueue = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<JSONObject> outgoingQueue = new ConcurrentLinkedQueue<>();
+
+    public ConnectionManager(String serverIP, int serverPort) {
+        this.serverIP = serverIP;
+        this.serverPort = serverPort;
+    }
+
+    private void startCommunication() {
+        senderThread = new Thread(this::sender);
+        receiverThread = new Thread(this::receiver);
+        senderThread.start();
+        receiverThread.start();
+    }
+
+    private void receiver() {
         while (true) {
             try {
-                JSONObject received = new JSONObject(dis.readUTF());
-                System.out.println("Received:\n" + received);
+                JSONObject msg = new JSONObject(this.dis.readUTF());
+                System.out.println("Received: " + msg);
+                incomingQueue.add(msg);
             } catch (JSONException e) {
                 System.err.println("Ignoring message because it has invalid JSON: " + e);
             } catch (IOException e) {
@@ -34,28 +51,31 @@ public class ConnectionManager implements Runnable {
         }
     }
 
-    public static void sender() {
+    private void sender() {
         while (true) {
             try {
-                System.out.print("Enter message: ");
-                String input = scanner.nextLine();
-                JSONObject message = new JSONObject();
-                message.put("username", username);
-                message.put("message", input);
-                message.put("command", "message");
-
-                System.out.println("Sending message\n" + message);
-                dos.writeUTF(message.toString());
+                JSONObject message = outgoingQueue.poll();
+                if (message != null) {
+                    System.out.println("Sending message\n" + message);
+                    dos.writeUTF(message.toString());
+                }
             } catch (IOException e) {
                 System.err.println("Connection closed.");
                 closeConnection();
                 break;
             }
         }
-        scanner.close();
     }
 
-    public static void closeConnection() {
+    public void queueMessage(JSONObject message) {
+        outgoingQueue.add(message);
+    }
+
+    public JSONObject pollIncomingMessage() {
+        return incomingQueue.poll();
+    }
+
+    public void closeConnection() {
         try {
             if (dis != null) {
                 dis.close();
@@ -78,47 +98,45 @@ public class ConnectionManager implements Runnable {
         }
     }
 
-    public static void login() {
+    public boolean login(String username, String password) {
         try {
-            System.out.print("Enter user: ");
-            username = scanner.nextLine();
-            System.out.print("Enter password: ");
-            String password = scanner.nextLine();
-            JSONObject message = new JSONObject();
-            message.put("username", username);
-            message.put("password", password);
-            message.put("command", "login");
+            JSONObject loginMsg = new JSONObject();
+            loginMsg.put("command", "login");
+            loginMsg.put("username", username);
+            loginMsg.put("password", password);
 
-            System.out.println("Sending message\n" + message);
-            dos.writeUTF(message.toString());
+            dos.writeUTF(loginMsg.toString());
+            JSONObject response = new JSONObject(dis.readUTF());
 
-            JSONObject received = new JSONObject(dis.readUTF());
-            System.out.println("Received:\n" + received);
-
+            if (response.getString("command").equals("ok")) {
+                this.username = username;
+                System.out.println("Login successful!");
+                startCommunication();
+                return true;
+            } else {
+                System.out.println("Login failed: " + response);
+                return false;
+            }
         } catch (IOException e) {
-            System.err.println("Connection closed.");
-            closeConnection();
+            System.err.println("Login error: " + e.getMessage());
+            return false;
         }
     }
 
     @Override
     public void run() {
         try {
-            scanner = new Scanner(System.in);
-            InetAddress ip = InetAddress.getByName("10.103.150.207");
-            socket = new Socket(ip, 2555);
+            InetAddress ip = InetAddress.getByName(serverIP);
+            socket = new Socket(ip, serverPort);
             dis = new DataInputStream(socket.getInputStream());
             dos = new DataOutputStream(socket.getOutputStream());
-
-            login();
-
-            senderThread = new Thread(ConnectionManager::sender);
-            receiverThread = new Thread(ConnectionManager::receiver);
-
-            senderThread.start();
-            receiverThread.start();
         } catch (IOException e) {
-            System.err.println("Client Error: " + e);
+            System.err.println("Connection error: " + e.getMessage());
+            closeConnection();
         }
+    }
+
+    public String getUsername() {
+        return username;
     }
 }

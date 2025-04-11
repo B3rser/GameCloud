@@ -5,7 +5,7 @@ import javax.swing.JFrame;
 
 public class GameLauncher {
 
-    public static void launchGame() {
+    public static void launchGame(ConnectionManager connectionManager) {
         JFrame window = new JFrame();
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setResizable(false);

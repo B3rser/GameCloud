@@ -7,10 +7,10 @@ package com.mycompany.gamecloud;
 import java.io.IOException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
@@ -19,6 +19,7 @@ import javafx.stage.Stage;
  * @author uriel
  */
 public class Scene1Controller {
+
     @FXML
     TextField nameTextField;
     @FXML
@@ -26,14 +27,28 @@ public class Scene1Controller {
     private Stage stage;
     private Scene scene;
     private Parent root;
+    private ConnectionManager connectionManager;
 
     public void login(ActionEvent e) throws IOException {
         String username = nameTextField.getText();
         String password = passTextField.getText();
 
-        Stage stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
-        stage.close();
+        connectionManager = new ConnectionManager("localhost", 2555);
+        connectionManager.run();
+        boolean success = connectionManager.login(username, password);
 
-        GameLauncher.launchGame();
+        if (success) {
+            try {
+                stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
+                stage.close();
+                GameLauncher.launchGame(connectionManager);
+            } catch (Exception ex) {
+                connectionManager.closeConnection();
+                System.out.println(ex.toString());
+            }
+        } else {
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Usuario o contraseña incorrectos");
+            alert.showAndWait();
+        }
     }
 }
