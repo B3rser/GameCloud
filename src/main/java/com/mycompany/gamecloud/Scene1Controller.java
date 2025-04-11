@@ -33,7 +33,8 @@ public class Scene1Controller {
         String username = nameTextField.getText();
         String password = passTextField.getText();
 
-        connectionManager = new ConnectionManager("localhost", 2555);
+        ConnectionManager.init("localhost", 2555);
+        connectionManager = ConnectionManager.getConnectionManagerInstance();
         connectionManager.run();
         boolean success = connectionManager.login(username, password);
 

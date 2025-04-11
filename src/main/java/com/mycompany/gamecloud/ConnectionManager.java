@@ -19,10 +19,31 @@ public class ConnectionManager implements Runnable {
 
     private Thread senderThread;
     private Thread receiverThread;
+    
+    private static ConnectionManager connectionManagerInstance;
 
     private final ConcurrentLinkedQueue<JSONObject> incomingQueue = new ConcurrentLinkedQueue<>();
     private final ConcurrentLinkedQueue<JSONObject> outgoingQueue = new ConcurrentLinkedQueue<>();
 
+    public static ConnectionManager getConnectionManagerInstance() {
+        if (connectionManagerInstance == null) {
+            throw new IllegalStateException("ConnectionManager has not yet been initialized.");
+        }
+        return connectionManagerInstance;
+    }
+    
+    public static boolean isInitialized() {
+        return connectionManagerInstance != null;
+    }
+    
+    public static void init(String serverIP, int serverPort) {
+        if (connectionManagerInstance != null) {
+            throw new IllegalStateException("ConnectionManager ya ha sido inicializado.");
+        }
+
+        connectionManagerInstance = new ConnectionManager(serverIP, serverPort);
+    }
+    
     public ConnectionManager(String serverIP, int serverPort) {
         this.serverIP = serverIP;
         this.serverPort = serverPort;
@@ -68,6 +89,7 @@ public class ConnectionManager implements Runnable {
     }
 
     public void queueMessage(JSONObject message) {
+        message.put("username", this.username);
         outgoingQueue.add(message);
     }
 

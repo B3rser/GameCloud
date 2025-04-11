@@ -2,6 +2,7 @@ package Game;
 
 import Game.entity.Player;
 import Game.tile.TilesHandler;
+import com.mycompany.gamecloud.ConnectionManager;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -9,6 +10,7 @@ import java.awt.Graphics2D;
 import javax.swing.JPanel;
 
 public class GamePanel extends JPanel implements Runnable {
+
     final int originalTileSize = 16;
     final int scale = 3;
     final int sizeTile = originalTileSize * scale;
@@ -17,7 +19,11 @@ public class GamePanel extends JPanel implements Runnable {
     final int widthScreen = sizeTile * maxColScreen;
     final int heightScreen = sizeTile * maxRenScreen;
 
+    private ConnectionManager connectionManager;
+
     Thread gameThread;
+    Thread getChangesThread;
+
     KeyHandler kH = new KeyHandler();
     Player player = new Player(this, kH);
     TilesHandler tH = new TilesHandler(this);
@@ -34,10 +40,13 @@ public class GamePanel extends JPanel implements Runnable {
         this.setDoubleBuffered(true);
         this.addKeyListener(kH);
         this.setFocusable(true);
+        connectionManager = ConnectionManager.getConnectionManagerInstance();
     }
 
     public void startGameThread() {
         this.gameThread = new Thread(this);
+        this.getChangesThread = new Thread(() -> getChanges());
+        this.getChangesThread.start();
         this.gameThread.start();
     }
 
@@ -57,6 +66,10 @@ public class GamePanel extends JPanel implements Runnable {
                 delta--;
             }
         }
+    }
+
+    public void getChanges() {
+        
     }
 
     public void update() {

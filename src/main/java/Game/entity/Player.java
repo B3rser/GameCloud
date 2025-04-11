@@ -1,22 +1,29 @@
 package Game.entity;
+
 import Game.GamePanel;
 import Game.KeyHandler;
+import com.mycompany.gamecloud.ConnectionManager;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class Player extends Entity {
+
     private GamePanel gP;
     private KeyHandler kH;
     private final int screenX, screenY;
+    private ConnectionManager connectionManager;
 
     public Player(GamePanel gP, KeyHandler kH) {
         this.gP = gP;
         this.kH = kH;
         this.screenX = gP.getWidthScreen() / 2 - (gP.getSizeTile() / 2);
         this.screenY = gP.getHeigthScreen() / 2 - (gP.getSizeTile() / 2);
+        connectionManager = ConnectionManager.getConnectionManagerInstance();
         initialConfiguration();
         getPlayerSprites();
     }
@@ -46,6 +53,7 @@ public class Player extends Entity {
     public void update() {
         if (kH.getUpKey() == true || kH.getDownKey() == true
                 || kH.getLeftKey() == true || kH.getRigthKey() == true) {
+            this.sendMessageMove();
             this.spriteCount++;
         }
         if (kH.getUpKey() == true) {
@@ -69,6 +77,14 @@ public class Player extends Entity {
             }
             this.spriteCount = 0;
         }
+    }
+
+    private void sendMessageMove() {
+        JSONObject message = new JSONObject();
+        message.put("command", "move");
+        message.put("direction", this.direction);
+
+        connectionManager.queueMessage(message);
     }
 
     public void draw(Graphics2D g2) {
@@ -110,7 +126,6 @@ public class Player extends Entity {
         g2.drawImage(sprite, this.screenX, this.screenY, gP.getSizeTile(),
                 gP.getSizeTile(), null);
     }
-
 
     public int getScreenX() {
         return this.screenX;
