@@ -1,0 +1,10 @@
+Game\GamePanel.class
+module-info.class
+Game\tile\TilesHandler.class
+Game\KeyHandler.class
+com\mycompany\gamecloud\GameLauncher.class
+Game\entity\Entity.class
+Game\tile\Tile.class
+com\mycompany\gamecloud\App.class
+com\mycompany\gamecloud\Scene1Controller.class
+Game\entity\Player.class
