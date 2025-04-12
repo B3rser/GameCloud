@@ -22,10 +22,10 @@ public class GamePanel extends JPanel implements Runnable {
     private ConnectionManager connectionManager;
 
     Thread gameThread;
-    Thread getChangesThread;
 
     KeyHandler kH = new KeyHandler();
     Player player = new Player(this, kH);
+    EntityManager eM = new EntityManager(this);
     TilesHandler tH = new TilesHandler(this);
     int FPS = 60;
 
@@ -45,8 +45,6 @@ public class GamePanel extends JPanel implements Runnable {
 
     public void startGameThread() {
         this.gameThread = new Thread(this);
-        this.getChangesThread = new Thread(() -> getChanges());
-        this.getChangesThread.start();
         this.gameThread.start();
     }
 
@@ -68,12 +66,9 @@ public class GamePanel extends JPanel implements Runnable {
         }
     }
 
-    public void getChanges() {
-        
-    }
-
     public void update() {
         player.update();
+        eM.update();
     }
 
     @Override
@@ -82,6 +77,7 @@ public class GamePanel extends JPanel implements Runnable {
         Graphics2D g2 = (Graphics2D) g;
         tH.draw(g2);
         player.draw(g2);
+        eM.draw(g2);
         g2.dispose();
     }
 

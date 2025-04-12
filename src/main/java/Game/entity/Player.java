@@ -8,14 +8,12 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.imageio.ImageIO;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class Player extends Entity {
 
     private GamePanel gP;
     private KeyHandler kH;
-    private final int screenX, screenY;
     private ConnectionManager connectionManager;
 
     public Player(GamePanel gP, KeyHandler kH) {
@@ -28,14 +26,14 @@ public class Player extends Entity {
         getPlayerSprites();
     }
 
-    public void initialConfiguration() {
-        this.worldX = gP.getSizeTile() * 38;
-        this.worldY = gP.getSizeTile() * 23;
+    private void initialConfiguration() {
+        this.worldX = gP.getSizeTile() * 38 - (gP.getSizeTile() / 2);
+        this.worldY = gP.getSizeTile() * 23 - (gP.getSizeTile() / 2);
         this.speed = 4;
         this.direction = "down";
     }
 
-    public void getPlayerSprites() {
+    private void getPlayerSprites() {
         try {
             this.up1 = ImageIO.read(getClass().getResourceAsStream("/assets/playerSprites/moverArriba1.png"));
             this.up2 = ImageIO.read(getClass().getResourceAsStream("/assets/playerSprites/moverArriba2.png"));
@@ -87,6 +85,7 @@ public class Player extends Entity {
         connectionManager.queueMessage(message);
     }
 
+    @Override
     public void draw(Graphics2D g2) {
         BufferedImage sprite = null;
         switch (this.direction) {
@@ -125,13 +124,5 @@ public class Player extends Entity {
         }
         g2.drawImage(sprite, this.screenX, this.screenY, gP.getSizeTile(),
                 gP.getSizeTile(), null);
-    }
-
-    public int getScreenX() {
-        return this.screenX;
-    }
-
-    public int getScreenY() {
-        return this.screenY;
     }
 }
