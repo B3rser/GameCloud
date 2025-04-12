@@ -1,5 +1,6 @@
 package Game;
 
+import Game.entity.Entity;
 import Game.entity.Player;
 import Game.tile.TilesHandler;
 import com.mycompany.gamecloud.ConnectionManager;
@@ -33,6 +34,7 @@ public class GamePanel extends JPanel implements Runnable {
     private final int maxColWorld = 78;
     private final int widthWorld = this.sizeTile * this.maxColWorld;
     private final int heightWorld = this.sizeTile * this.maxRenWorld;
+    private Entity[] obj;
 
     public GamePanel() {
         this.setPreferredSize(new Dimension(this.widthScreen, this.heightScreen));
@@ -120,5 +122,12 @@ public class GamePanel extends JPanel implements Runnable {
     public Player getPlayer() {
         return this.player;
     }
-
+    public TilesHandler getTilesHandler() {
+    return this.tH;
+}
+    public Entity[] getEntities() {
+    return this.obj; 
+}
+    
+ 
 }

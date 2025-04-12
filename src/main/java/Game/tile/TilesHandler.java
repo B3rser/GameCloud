@@ -12,8 +12,8 @@ public class TilesHandler {
 
     private GamePanel gP;
     private int maxTiles = 10;
-    Tile[] tilesArray;
-    private int tilesMapCodes[][];
+     public Tile[] tilesArray;
+    public int tilesMapCodes[][];
 
     public TilesHandler(GamePanel gP) {
         this.gP = gP;

@@ -1,6 +1,7 @@
 package Game.entity;
 
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
 public abstract class Entity {
@@ -13,7 +14,17 @@ public abstract class Entity {
     protected int spriteCount = 0;
     protected int numSprite = 1;
     protected int changeSprite = 15;
+ 
 
+    // Rectángulo de colisión
+    public Rectangle detectColision;
+    public int detectColisionDefaultX;
+    public int detectColisionDefaultY;
+
+    // Estado de colisión
+    public boolean colisionOn;
+
+    
     public int getSpeed() {
         return this.speed;
     }
@@ -51,4 +62,5 @@ public abstract class Entity {
     }
     
     public abstract void draw(Graphics2D g2);
+   
 }
