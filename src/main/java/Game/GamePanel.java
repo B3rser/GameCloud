@@ -54,9 +54,6 @@ public class GamePanel extends JPanel implements Runnable {
         this.tH = new TilesHandler(this);
         this.connectionManager = ConnectionManager.getConnectionManagerInstance();
 
-        this.tH = new TilesHandler(this);
-        this.connectionManager = ConnectionManager.getConnectionManagerInstance();
-
         this.setPreferredSize(new Dimension(this.widthScreen, this.heightScreen));
         this.setBackground(Color.black);
         this.setDoubleBuffered(true);
@@ -85,7 +82,7 @@ public class GamePanel extends JPanel implements Runnable {
         this.kH = new KeyHandler();
         this.player = new Player(this, kH, playerSpeed, spawnX, spawnY);
         this.eM = new EntityManager(this);
-        this.tH = new TilesHandler(this);
+        this.tH = new TilesHandler(this, map);
         this.connectionManager = ConnectionManager.getConnectionManagerInstance();
 
         this.setPreferredSize(new Dimension(this.widthScreen, this.heightScreen));

@@ -6,7 +6,7 @@ import org.json.JSONObject;
 
 public class GameLauncher {
 
-    public static void launchGame(ConnectionManager connectionManager, JSONObject initialData) {
+    public static void launchGame(JSONObject initialData) {
         JFrame window = new JFrame();
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setResizable(false);

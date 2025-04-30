@@ -25,6 +25,14 @@ public class TilesHandler {
         loadMap("/assets/maps/world01.txt");
     }
 
+    public TilesHandler(GamePanel gP, String map) {
+        this.gP = gP;
+        this.tilesArray = new Tile[maxTiles];
+        this.tilesMapCodes = new int[gP.getMaxRenWorld()][gP.getMaxColWorld()];
+        getImgTile();
+        loadInitialMap(map);
+    }
+
     public void getImgTile() {
         try {
             tilesArray[0] = new Tile();
@@ -63,6 +71,33 @@ public class TilesHandler {
                 }
             }
             br.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void loadInitialMap(String mapData) {
+        try {
+            int ren = 0, col = 0;
+            for (int i = 0; i < mapData.length(); i++) {
+                char c = mapData.charAt(i);
+
+                if (!Character.isDigit(c)) {
+                    continue;
+                }
+
+                int code = Character.getNumericValue(c);
+                this.tilesMapCodes[ren][col] = code;
+                col++;
+
+                if (col == gP.getMaxColWorld()) {
+                    col = 0;
+                    ren++;
+                    if (ren == gP.getMaxRenWorld()) {
+                        break;
+                    }
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

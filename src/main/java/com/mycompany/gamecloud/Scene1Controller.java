@@ -36,21 +36,20 @@ public class Scene1Controller {
         String username = nameTextField.getText();
         String password = passTextField.getText();
 
-        ConnectionManager.init("localhost", 2555);
         connectionManager = ConnectionManager.getConnectionManagerInstance();
-        connectionManager.run();
         JSONObject result = connectionManager.login(username, password);
 
         if (result.getString("command").equals("ok")) {
             try {
                 stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
                 stage.close();
-                GameLauncher.launchGame(connectionManager, result);
+                GameLauncher.launchGame(result);
             } catch (Exception ex) {
                 connectionManager.closeConnection();
                 System.out.println(ex.toString());
             }
         } else {
+            connectionManager.run();
             Alert alert = new Alert(Alert.AlertType.ERROR, "Usuario o contraseña incorrectos");
             alert.showAndWait();
         }

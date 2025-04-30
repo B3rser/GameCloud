@@ -17,13 +17,13 @@ public class ConnectionManager implements Runnable {
     private DataOutputStream dos;
     private String username;
 
-    //private Thread senderThread;
+    private Thread senderThread;
     private Thread receiverThread;
 
     private static ConnectionManager connectionManagerInstance;
 
     private final ConcurrentLinkedQueue<JSONObject> incomingQueue = new ConcurrentLinkedQueue<>();
-    //private final ConcurrentLinkedQueue<JSONObject> outgoingQueue = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<JSONObject> outgoingQueue = new ConcurrentLinkedQueue<>();
 
     public static ConnectionManager getConnectionManagerInstance() {
         if (connectionManagerInstance == null) {
@@ -50,9 +50,9 @@ public class ConnectionManager implements Runnable {
     }
 
     private void startCommunication() {
-        //senderThread = new Thread(this::sender);
+        senderThread = new Thread(this::sender);
         receiverThread = new Thread(this::receiver);
-        //senderThread.start();
+        senderThread.start();
         receiverThread.start();
     }
 
@@ -72,12 +72,12 @@ public class ConnectionManager implements Runnable {
         }
     }
 
-    /*private void sender() {
+    private void sender() {
         while (true) {
             try {
                 JSONObject message = outgoingQueue.poll();
                 if (message != null) {
-                    System.out.println("Sending message\n" + message);
+                    System.out.println("Sending:\t" + message);
                     dos.writeUTF(message.toString());
                 }
             } catch (IOException e) {
@@ -86,22 +86,11 @@ public class ConnectionManager implements Runnable {
                 break;
             }
         }
-    }*/
+    }
 
-    /*public void queueMessage(JSONObject message) {
-        message.put("username", this.username);
-        outgoingQueue.add(message);
-    }*/
-    
     public void queueMessage(JSONObject message) {
         message.put("username", this.username);
-        try {
-            System.out.println("Sending:\t" + message);
-            dos.writeUTF(message.toString());
-        } catch (IOException e) {
-            System.err.println("Connection closed.");
-            closeConnection();
-        }
+        outgoingQueue.add(message);
     }
 
     public JSONObject pollIncomingMessage() {
@@ -123,9 +112,10 @@ public class ConnectionManager implements Runnable {
             System.err.println("Error closing resources: " + e);
         }
 
-        /*if (senderThread != null) {
+        if (senderThread != null) {
             senderThread.interrupt();
-        }*/
+        }
+
         if (receiverThread != null) {
             receiverThread.interrupt();
         }
@@ -148,6 +138,7 @@ public class ConnectionManager implements Runnable {
                 return response;
             } else {
                 System.out.println("Login failed: " + response);
+                this.closeConnection();
                 return response;
             }
         } catch (IOException e) {
@@ -157,6 +148,7 @@ public class ConnectionManager implements Runnable {
             errorMsg.put("command", "error");
             errorMsg.put("command", e.getMessage());
 
+            this.closeConnection();
             return errorMsg;
         }
     }
