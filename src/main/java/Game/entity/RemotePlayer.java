@@ -1,4 +1,3 @@
-
 package Game.entity;
 
 import Game.GamePanel;
@@ -12,6 +11,7 @@ import javax.imageio.ImageIO;
  * @author uriel
  */
 public class RemotePlayer extends Entity {
+
     private GamePanel gP;
 
     public RemotePlayer(GamePanel gP) {
@@ -22,7 +22,7 @@ public class RemotePlayer extends Entity {
         this.direction = "down";
         getPlayerSprites();
     }
-    
+
     public RemotePlayer(GamePanel gP, int x, int y, int numLives, String facing) {
         this.gP = gP;
         this.worldX = x;
@@ -70,8 +70,37 @@ public class RemotePlayer extends Entity {
         }
         g2.drawImage(sprite, this.screenX, this.screenY, gP.getSizeTile(), gP.getSizeTile(), null);
     }
-    
-    public void updateInfo(int x, int y, int numLives, String facing){
+
+    public void update(String direction) {
+        this.setDirection(direction);
+        this.spriteCount++;
+
+        switch (direction) {
+            case "up":
+                this.setWorldY(this.getWorldY() - this.getSpeed());
+                break;
+            case "down":
+                this.setWorldY(this.getWorldY() + this.getSpeed());
+                break;
+            case "left":
+                this.setWorldX(this.getWorldX() - this.getSpeed());
+                break;
+            case "right":
+                this.setWorldX(this.getWorldX() + this.getSpeed());
+                break;
+        }
+        
+        if (this.spriteCount > this.changeSprite) {
+            if (this.numSprite == 1) {
+                this.numSprite = 2;
+            } else {
+                this.numSprite = 1;
+            }
+            this.spriteCount = 0;
+        }
+    }
+
+    public void updateInfo(int x, int y, int numLives, String facing) {
         this.worldX = x;
         this.worldY = y;
         this.direction = facing;
