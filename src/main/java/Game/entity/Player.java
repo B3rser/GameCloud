@@ -77,13 +77,19 @@ public class Player extends Entity {
         }
     }
 
-    private void sendMessageMove() {
+    /*private void sendMessageMove() {
         JSONObject message = new JSONObject();
         message.put("command", "move");
         message.put("direction", this.direction);
 
         connectionManager.queueMessage(message);
+    }*/
+    private void sendMessageMove() {
+        JSONObject message = new JSONObject();
+        message.put("command", this.direction); // "up", "down", "left" o "right"
+        connectionManager.queueMessage(message);
     }
+
 
     @Override
     public void draw(Graphics2D g2) {
