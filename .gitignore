@@ -6,3 +6,4 @@ lib/
 *.class
 *.iml
 *.lst
+target/

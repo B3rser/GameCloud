@@ -26,10 +26,27 @@ public class Player extends Entity {
         getPlayerSprites();
     }
 
+    public Player(GamePanel gP, KeyHandler kH, int speed, int spawnX, int spawnY) {
+        this.gP = gP;
+        this.kH = kH;
+        this.screenX = gP.getWidthScreen() / 2 - (gP.getSizeTile() / 2);
+        this.screenY = gP.getHeigthScreen() / 2 - (gP.getSizeTile() / 2);
+        connectionManager = ConnectionManager.getConnectionManagerInstance();
+        initialConfiguration(speed, spawnX, spawnY);
+        getPlayerSprites();
+    }
+
     private void initialConfiguration() {
         this.worldX = gP.getSizeTile() * 38 - (gP.getSizeTile() / 2);
         this.worldY = gP.getSizeTile() * 23 - (gP.getSizeTile() / 2);
         this.speed = 4;
+        this.direction = "down";
+    }
+
+    private void initialConfiguration(int speed, int spawnX, int spawnY) {
+        this.worldX = spawnX;
+        this.worldY = spawnY;
+        this.speed = speed;
         this.direction = "down";
     }
 

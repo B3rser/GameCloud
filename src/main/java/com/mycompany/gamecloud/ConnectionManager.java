@@ -19,7 +19,7 @@ public class ConnectionManager implements Runnable {
 
     private Thread senderThread;
     private Thread receiverThread;
-    
+
     private static ConnectionManager connectionManagerInstance;
 
     private final ConcurrentLinkedQueue<JSONObject> incomingQueue = new ConcurrentLinkedQueue<>();
@@ -31,11 +31,11 @@ public class ConnectionManager implements Runnable {
         }
         return connectionManagerInstance;
     }
-    
+
     public static boolean isInitialized() {
         return connectionManagerInstance != null;
     }
-    
+
     public static void init(String serverIP, int serverPort) {
         if (connectionManagerInstance != null) {
             throw new IllegalStateException("ConnectionManager ya ha sido inicializado.");
@@ -43,7 +43,7 @@ public class ConnectionManager implements Runnable {
 
         connectionManagerInstance = new ConnectionManager(serverIP, serverPort);
     }
-    
+
     public ConnectionManager(String serverIP, int serverPort) {
         this.serverIP = serverIP;
         this.serverPort = serverPort;
@@ -120,7 +120,7 @@ public class ConnectionManager implements Runnable {
         }
     }
 
-    public boolean login(String username, String password) {
+    public JSONObject login(String username, String password) {
         try {
             JSONObject loginMsg = new JSONObject();
             loginMsg.put("command", "login");
@@ -134,14 +134,19 @@ public class ConnectionManager implements Runnable {
                 this.username = username;
                 System.out.println("Login successful!");
                 startCommunication();
-                return true;
+                return response;
             } else {
                 System.out.println("Login failed: " + response);
-                return false;
+                return response;
             }
         } catch (IOException e) {
             System.err.println("Login error: " + e.getMessage());
-            return false;
+            JSONObject errorMsg = new JSONObject();
+            errorMsg.put("username", "client");
+            errorMsg.put("command", "error");
+            errorMsg.put("command", e.getMessage());
+
+            return errorMsg;
         }
     }
 

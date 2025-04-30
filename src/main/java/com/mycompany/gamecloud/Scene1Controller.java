@@ -13,6 +13,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import org.json.JSONObject;
 
 /**
  *
@@ -36,13 +37,13 @@ public class Scene1Controller {
         ConnectionManager.init("localhost", 2555);
         connectionManager = ConnectionManager.getConnectionManagerInstance();
         connectionManager.run();
-        boolean success = connectionManager.login(username, password);
+        JSONObject result = connectionManager.login(username, password);
 
-        if (success) {
+        if (result.getString("command").equals("ok")) {
             try {
                 stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
                 stage.close();
-                GameLauncher.launchGame(connectionManager);
+                GameLauncher.launchGame(connectionManager, result);
             } catch (Exception ex) {
                 connectionManager.closeConnection();
                 System.out.println(ex.toString());

@@ -5,16 +5,16 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
 public abstract class Entity {
+
     protected int worldX, worldY;
     protected int screenX, screenY;
     protected int speed;
     protected BufferedImage up1, up2, down1, down2,
             left1, left2, right1, right2;
-    protected String direction;
+    protected String direction = "down";
     protected int spriteCount = 0;
     protected int numSprite = 1;
     protected int changeSprite = 15;
- 
 
     // Rectángulo de colisión
     public Rectangle detectColision;
@@ -24,7 +24,6 @@ public abstract class Entity {
     // Estado de colisión
     public boolean colisionOn;
 
-    
     public int getSpeed() {
         return this.speed;
     }
@@ -60,7 +59,11 @@ public abstract class Entity {
     public int getScreenY() {
         return this.screenY;
     }
-    
+
+    public String getDirection() {
+        return direction;
+    }
+
     public abstract void draw(Graphics2D g2);
-   
+
 }

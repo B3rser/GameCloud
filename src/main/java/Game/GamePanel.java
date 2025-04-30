@@ -12,37 +12,87 @@ import javax.swing.JPanel;
 
 public class GamePanel extends JPanel implements Runnable {
 
-    final int originalTileSize = 16;
-    final int scale = 3;
-    final int sizeTile = originalTileSize * scale;
-    final int maxRenScreen = 15;
-    final int maxColScreen = 26;
-    final int widthScreen = sizeTile * maxColScreen;
-    final int heightScreen = sizeTile * maxRenScreen;
+    private final int originalTileSize = 16;
+    private final int scale = 3;
+    private final int sizeTile = originalTileSize * scale;
+    private final int maxRenScreen = 15;
+    private final int maxColScreen = 26;
+
+    private int widthScreen;
+    private int heightScreen;
+
+    private int maxRenWorld;
+    private int maxColWorld;
+    private int widthWorld;
+    private int heightWorld;
+
+    private int FPS = 60;
+
+    private Thread gameThread;
+
+    private KeyHandler kH;
+    private Player player;
+    private EntityManager eM;
+    private TilesHandler tH;
 
     private ConnectionManager connectionManager;
 
-    Thread gameThread;
-
-    KeyHandler kH = new KeyHandler();
-    Player player = new Player(this, kH);
-    EntityManager eM = new EntityManager(this);
-    TilesHandler tH = new TilesHandler(this);
-    int FPS = 60;
-
-    private final int maxRenWorld = 45;
-    private final int maxColWorld = 78;
-    private final int widthWorld = this.sizeTile * this.maxColWorld;
-    private final int heightWorld = this.sizeTile * this.maxRenWorld;
     private Entity[] obj;
 
     public GamePanel() {
+        this.maxColWorld = 78;
+        this.maxRenWorld = 45;
+
+        this.widthScreen = sizeTile * maxColScreen;
+        this.heightScreen = sizeTile * maxRenScreen;
+        this.widthWorld = sizeTile * maxColWorld;
+        this.heightWorld = sizeTile * maxRenWorld;
+
+        this.kH = new KeyHandler();
+        this.player = new Player(this, kH);
+        this.eM = new EntityManager(this);
+        this.tH = new TilesHandler(this);
+        this.connectionManager = ConnectionManager.getConnectionManagerInstance();
+
+        this.tH = new TilesHandler(this);
+        this.connectionManager = ConnectionManager.getConnectionManagerInstance();
+
         this.setPreferredSize(new Dimension(this.widthScreen, this.heightScreen));
         this.setBackground(Color.black);
         this.setDoubleBuffered(true);
         this.addKeyListener(kH);
         this.setFocusable(true);
-        connectionManager = ConnectionManager.getConnectionManagerInstance();
+    }
+
+    public GamePanel(
+            int maxColWorld,
+            int maxRenWorld,
+            int widthScreen,
+            int heightScreen,
+            int playerSpeed,
+            int projectileSpeed,
+            String map,
+            int spawnX,
+            int spawnY
+    ) {
+        this.maxColWorld = maxColWorld;
+        this.maxRenWorld = maxRenWorld;
+        this.widthScreen = widthScreen;
+        this.heightScreen = heightScreen;
+        this.widthWorld = sizeTile * maxColWorld;
+        this.heightWorld = sizeTile * maxRenWorld;
+
+        this.kH = new KeyHandler();
+        this.player = new Player(this, kH, playerSpeed, spawnX, spawnY);
+        this.eM = new EntityManager(this);
+        this.tH = new TilesHandler(this);
+        this.connectionManager = ConnectionManager.getConnectionManagerInstance();
+
+        this.setPreferredSize(new Dimension(this.widthScreen, this.heightScreen));
+        this.setBackground(Color.black);
+        this.setDoubleBuffered(true);
+        this.addKeyListener(kH);
+        this.setFocusable(true);
     }
 
     public void startGameThread() {
@@ -122,12 +172,13 @@ public class GamePanel extends JPanel implements Runnable {
     public Player getPlayer() {
         return this.player;
     }
+
     public TilesHandler getTilesHandler() {
-    return this.tH;
-}
+        return this.tH;
+    }
+
     public Entity[] getEntities() {
-    return this.obj; 
-}
-    
- 
+        return this.obj;
+    }
+
 }

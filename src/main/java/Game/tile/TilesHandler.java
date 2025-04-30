@@ -5,14 +5,16 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
 import javax.imageio.ImageIO;
+
 import Game.GamePanel;
 
 public class TilesHandler {
 
     private GamePanel gP;
     private int maxTiles = 10;
-     public Tile[] tilesArray;
+    public Tile[] tilesArray;
     public int tilesMapCodes[][];
 
     public TilesHandler(GamePanel gP) {
