@@ -22,6 +22,15 @@ public class RemotePlayer extends Entity {
         this.direction = "down";
         getPlayerSprites();
     }
+    
+    public RemotePlayer(GamePanel gP, int x, int y, int numLives, String facing) {
+        this.gP = gP;
+        this.worldX = x;
+        this.worldY = y;
+        this.speed = 4;
+        this.direction = facing;
+        getPlayerSprites();
+    }
 
     private void getPlayerSprites() {
         try {
@@ -60,5 +69,11 @@ public class RemotePlayer extends Entity {
                 break;
         }
         g2.drawImage(sprite, this.screenX, this.screenY, gP.getSizeTile(), gP.getSizeTile(), null);
+    }
+    
+    public void updateInfo(int x, int y, int numLives, String facing){
+        this.worldX = x;
+        this.worldY = y;
+        this.direction = facing;
     }
 }

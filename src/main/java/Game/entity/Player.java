@@ -1,20 +1,24 @@
 package Game.entity;
 
-import Game.GamePanel;
-import Game.KeyHandler;
-import com.mycompany.gamecloud.ConnectionManager;
-
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+
 import javax.imageio.ImageIO;
+
 import org.json.JSONObject;
+
+import com.mycompany.gamecloud.ConnectionManager;
+
+import Game.GamePanel;
+import Game.KeyHandler;
 
 public class Player extends Entity {
 
     private GamePanel gP;
     private KeyHandler kH;
     private ConnectionManager connectionManager;
+    private int numLives = 0;
 
     public Player(GamePanel gP, KeyHandler kH) {
         this.gP = gP;
@@ -24,6 +28,7 @@ public class Player extends Entity {
         connectionManager = ConnectionManager.getConnectionManagerInstance();
         initialConfiguration();
         getPlayerSprites();
+        sendStatus(true);
     }
 
     public Player(GamePanel gP, KeyHandler kH, int speed, int spawnX, int spawnY) {
@@ -34,6 +39,7 @@ public class Player extends Entity {
         connectionManager = ConnectionManager.getConnectionManagerInstance();
         initialConfiguration(speed, spawnX, spawnY);
         getPlayerSprites();
+        sendStatus(true);
     }
 
     private void initialConfiguration() {
@@ -107,6 +113,16 @@ public class Player extends Entity {
         connectionManager.queueMessage(message);
     }
 
+    public void sendStatus(Boolean isSpawn) {
+        JSONObject message = new JSONObject();
+        message.put("command", isSpawn ? "spawn" : "status");
+        message.put("x", this.worldX);
+        message.put("y", this.worldY);
+        message.put("numLives", this.numLives);
+        message.put("facing", this.direction);
+
+        connectionManager.queueMessage(message);
+    }
 
     @Override
     public void draw(Graphics2D g2) {
