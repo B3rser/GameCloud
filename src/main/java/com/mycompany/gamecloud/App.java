@@ -10,8 +10,6 @@ import java.io.IOException;
 
 public class App extends Application {
 
-    private ConnectionManager connectionManager;
-
     @Override
     public void start(Stage stage) throws IOException {
         try {
@@ -19,9 +17,6 @@ public class App extends Application {
             Scene scene = new Scene(root);
             stage.setScene(scene);
             stage.show();
-            ConnectionManager.init("localhost", 2555);
-            connectionManager = ConnectionManager.getConnectionManagerInstance();
-            connectionManager.run();
         } catch (IOException e) {
             e.printStackTrace();
         }

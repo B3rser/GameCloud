@@ -1,12 +1,14 @@
 package com.mycompany.gamecloud;
 
-import org.json.JSONObject;
-
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
 import org.json.JSONException;
+import org.json.JSONObject;
 
 public class ConnectionManager implements Runnable {
 
@@ -16,6 +18,7 @@ public class ConnectionManager implements Runnable {
     private DataInputStream dis;
     private DataOutputStream dos;
     private String username;
+    private Boolean isConnected = false;
 
     private Thread senderThread;
     private Thread receiverThread;
@@ -34,6 +37,10 @@ public class ConnectionManager implements Runnable {
 
     public static boolean isInitialized() {
         return connectionManagerInstance != null;
+    }
+
+    public Boolean getIsConnected() {
+        return isConnected;
     }
 
     public static void init(String serverIP, int serverPort) {
@@ -119,6 +126,8 @@ public class ConnectionManager implements Runnable {
         if (receiverThread != null) {
             receiverThread.interrupt();
         }
+
+        this.isConnected = false;
     }
 
     public JSONObject login(String username, String password) {
@@ -146,7 +155,7 @@ public class ConnectionManager implements Runnable {
             JSONObject errorMsg = new JSONObject();
             errorMsg.put("username", "client");
             errorMsg.put("command", "error");
-            errorMsg.put("command", e.getMessage());
+            errorMsg.put("message", e.getMessage());
 
             this.closeConnection();
             return errorMsg;
@@ -160,6 +169,7 @@ public class ConnectionManager implements Runnable {
             socket = new Socket(ip, serverPort);
             dis = new DataInputStream(socket.getInputStream());
             dos = new DataOutputStream(socket.getOutputStream());
+            this.isConnected = true;
         } catch (IOException e) {
             System.err.println("Connection error: " + e.getMessage());
             closeConnection();
