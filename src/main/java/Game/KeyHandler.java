@@ -5,7 +5,7 @@ import java.awt.event.KeyListener;
 
 public class KeyHandler implements KeyListener {
 
-    private boolean upKey, downKey, leftKey, rigthKey;
+    private boolean upKey, downKey, leftKey, rigthKey, shoot, exit;
 
     @Override
     public void keyTyped(KeyEvent e) {
@@ -26,6 +26,12 @@ public class KeyHandler implements KeyListener {
             case KeyEvent.VK_D:
                 rigthKey = true;
                 break;
+            case KeyEvent.VK_ESCAPE:
+                exit = true;
+                break;
+            case KeyEvent.VK_SPACE:
+                shoot = true;
+                break;
         }
     }
 
@@ -44,6 +50,12 @@ public class KeyHandler implements KeyListener {
             case KeyEvent.VK_D:
                 rigthKey = false;
                 break;
+            case KeyEvent.VK_ESCAPE:
+                exit = false;
+                break;
+            case KeyEvent.VK_SPACE:
+                shoot = false;
+                break;
         }
     }
 
@@ -61,5 +73,13 @@ public class KeyHandler implements KeyListener {
 
     public boolean getRigthKey() {
         return this.rigthKey;
+    }
+
+    public boolean getExit() {
+        return this.exit;
+    }
+
+    public boolean getShoot() {
+        return this.shoot;
     }
 }

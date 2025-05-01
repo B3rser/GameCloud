@@ -72,7 +72,7 @@ public class ConnectionManager implements Runnable {
             } catch (JSONException e) {
                 System.err.println("Ignoring message because it has invalid JSON: " + e);
             } catch (IOException e) {
-                System.err.println("Connection closed.");
+                System.err.println("Receiver ERROR.");
                 closeConnection();
                 break;
             }
@@ -88,7 +88,7 @@ public class ConnectionManager implements Runnable {
                     dos.writeUTF(message.toString());
                 }
             } catch (IOException e) {
-                System.err.println("Connection closed.");
+                System.err.println("Sender ERROR.");
                 closeConnection();
                 break;
             }
@@ -105,29 +105,36 @@ public class ConnectionManager implements Runnable {
     }
 
     public void closeConnection() {
-        try {
-            if (dis != null) {
-                dis.close();
-            }
-            if (dos != null) {
-                dos.close();
-            }
-            if (socket != null) {
-                socket.close();
-            }
-        } catch (IOException e) {
-            System.err.println("Error closing resources: " + e);
-        }
+        if (this.isConnected) {
+            System.out.println("Closing the connection.");
 
-        if (senderThread != null) {
-            senderThread.interrupt();
-        }
+            try {
+                if (dis != null) {
+                    dis.close();
+                }
+                if (dos != null) {
+                    dos.close();
+                }
+                if (socket != null) {
+                    socket.close();
+                }
+            } catch (IOException e) {
+                System.err.println("Error closing resources: " + e);
+            }
 
-        if (receiverThread != null) {
-            receiverThread.interrupt();
-        }
+            if (senderThread != null) {
+                senderThread.interrupt();
+            }
 
-        this.isConnected = false;
+            if (receiverThread != null) {
+                receiverThread.interrupt();
+            }
+
+            this.isConnected = false;
+            System.out.println("Connection closed.");
+        } else {
+            System.out.println("Connection closing already in progress.");
+        }
     }
 
     public JSONObject login(String username, String password) {

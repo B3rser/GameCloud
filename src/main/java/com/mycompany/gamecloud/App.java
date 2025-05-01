@@ -17,6 +17,13 @@ public class App extends Application {
             Scene scene = new Scene(root);
             stage.setScene(scene);
             stage.show();
+
+            ConnectionManager connectionManager = ConnectionManager.getConnectionManagerInstance();
+
+            stage.setOnCloseRequest(event -> {
+                connectionManager.closeConnection();
+            });
+
         } catch (IOException e) {
             e.printStackTrace();
         }

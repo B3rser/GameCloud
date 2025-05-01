@@ -77,6 +77,17 @@ public class Player extends Entity {
             this.sendMessageMove();
             this.spriteCount++;
         }
+
+        if (kH.getShoot() == true) {
+            this.shoot();
+            return;
+        }
+
+        if (kH.getExit() == true) {
+            gP.closeGameWindow();
+            return;
+        }
+
         if (kH.getUpKey() == true) {
             setWorldY(getWorldY() - getSpeed());
             this.direction = "up";
@@ -98,6 +109,10 @@ public class Player extends Entity {
             }
             this.spriteCount = 0;
         }
+    }
+
+    private void shoot() {
+        System.out.println("Shoot");
     }
 
     /*private void sendMessageMove() {

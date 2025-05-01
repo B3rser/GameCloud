@@ -8,6 +8,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 public class GamePanel extends JPanel implements Runnable {
@@ -38,6 +39,8 @@ public class GamePanel extends JPanel implements Runnable {
     private ConnectionManager connectionManager;
 
     private Entity[] obj;
+
+    private JFrame gameWindow;
 
     public GamePanel() {
         this.maxColWorld = 78;
@@ -90,6 +93,24 @@ public class GamePanel extends JPanel implements Runnable {
         this.setDoubleBuffered(true);
         this.addKeyListener(kH);
         this.setFocusable(true);
+    }
+
+    public void setGameWindow(JFrame window) {
+        this.gameWindow = window;
+    }
+
+    public void closeGameWindow() {
+        connectionManager.closeConnection();
+
+        if (this.gameWindow != null) {
+            this.gameWindow.dispose();
+        }
+        
+        if (gameThread != null) {
+            gameThread.interrupt();
+        }
+
+        System.exit(0);
     }
 
     public void startGameThread() {

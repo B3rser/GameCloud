@@ -99,14 +99,13 @@ public class Scene1Controller {
         connectionManager = ConnectionManager.getConnectionManagerInstance();
         JSONObject result = connectionManager.login(username, password);
 
-        try {
-        } catch (Exception ex) {
-
-        }
-
         if (result.getString("command").equals("ok")) {
             try {
                 stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
+                stage.setOnCloseRequest(event -> {
+                    System.out.println("Switching to the game window");
+                });
+
                 stage.close();
                 GameLauncher.launchGame(result);
             } catch (Exception ex) {
