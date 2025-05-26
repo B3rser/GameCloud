@@ -4,7 +4,7 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
-public abstract class Entity {
+public  class Entity {
 
     protected int worldX, worldY;
     protected int screenX, screenY;
@@ -63,7 +63,7 @@ public abstract class Entity {
     public String getDirection() {
         return direction;
     }
-
-    public abstract void draw(Graphics2D g2);
-
+    /*
+    public void draw(Graphics2D g2);
+*/
 }

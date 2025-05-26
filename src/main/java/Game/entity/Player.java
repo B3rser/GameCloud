@@ -1,8 +1,12 @@
 package Game.entity;
 
 import java.awt.Graphics2D;
+
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.awt.Rectangle;
 
 import javax.imageio.ImageIO;
 
@@ -18,7 +22,15 @@ public class Player extends Entity {
     private GamePanel gP;
     private KeyHandler kH;
     private ConnectionManager connectionManager;
-    private int numLives = 0;
+
+    public BufferedImage imageShoot;
+    public List <Disparo> disparos;
+    private long timeLastShoot=0;
+    public final long timeBetweenShoots=400;
+    // Vidas jugador
+    public int numLives = 3; // Número de vidas del jugador
+    private BufferedImage heart1, heart2, heart3, heart0;
+    public boolean isAlive = true;
 
     public Player(GamePanel gP, KeyHandler kH) {
         this.gP = gP;
@@ -28,6 +40,7 @@ public class Player extends Entity {
         connectionManager = ConnectionManager.getConnectionManagerInstance();
         initialConfiguration();
         getPlayerSprites();
+        this.disparos = new ArrayList<>();
         sendStatus(true);
     }
 
@@ -39,7 +52,18 @@ public class Player extends Entity {
         connectionManager = ConnectionManager.getConnectionManagerInstance();
         initialConfiguration(speed, spawnX, spawnY);
         getPlayerSprites();
+        loadImageLifes();
         sendStatus(true);
+    }
+    private void loadImageLifes() {
+        try {
+            this.heart1 = ImageIO.read(getClass().getResourceAsStream("/assets/playerSprites/corazon1.png"));
+            this.heart2 = ImageIO.read(getClass().getResourceAsStream("/assets/playerSprites/corazon2.png"));
+            this.heart3 = ImageIO.read(getClass().getResourceAsStream("/assets/playerSprites/corazon3.png"));
+            this.heart0 = ImageIO.read(getClass().getResourceAsStream("/assets/playerSprites/corazon0.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void initialConfiguration() {
@@ -72,6 +96,9 @@ public class Player extends Entity {
     }
 
     public void update() {
+        if(isAlive){
+            return;
+        }
         if (kH.getUpKey() == true || kH.getDownKey() == true
                 || kH.getLeftKey() == true || kH.getRigthKey() == true) {
             this.sendMessageMove();
@@ -81,6 +108,14 @@ public class Player extends Entity {
         if (kH.getShoot() == true) {
             this.shoot();
             return;
+        }
+        actualShoot(); // actualiza los disparos 
+        for(Disparo disparo : disparos){
+            if(colisionaConDisparo(disparo)){
+                this.numLives--;
+                disparos.remove(disparo);
+                break;
+            }
         }
 
         if (kH.getExit() == true) {
@@ -109,10 +144,72 @@ public class Player extends Entity {
             }
             this.spriteCount = 0;
         }
+
+    }
+        private boolean colisionaConDisparo(Disparo disparo) {
+        // Verificar si las coordenadas del disparo coinciden con las del jugador
+        Rectangle jugadorHitbox = new Rectangle(worldX, worldY, gP.getSizeTile(), gP.getSizeTile());
+        Rectangle disparoHitbox = new Rectangle(disparo.getX(), disparo.getY());
+
+        return jugadorHitbox.intersects(disparoHitbox);
     }
 
     private void shoot() {
+        long time =System.currentTimeMillis();
+        int posX = this.worldX ;
+        int posY = this.worldY ;
+
+        switch (direction) {
+            case "up":
+                posY -= gP.getSizeTile();
+                break;
+            case "down":
+                posY += gP.getSizeTile();
+                break;
+            case "left":
+                posX -= gP.getSizeTile();
+                break;
+            case "rigt":
+                posX += gP.getSizeTile();
+                break;
+        }
+        if(time - timeLastShoot >= timeBetweenShoots){
+            loadImageShoot();
+            Disparo disparo = new Disparo(posX, posY, this.direction, imageShoot);
+            disparos.add(disparo);
+            timeLastShoot = time;
+            return;
+        }
         System.out.println("Shoot");
+    }
+
+    private void loadImageShoot() {
+     if (direction == "up") {
+            try {
+                imageShoot = ImageIO.read(getClass().getResourceAsStream("/spritesjugador/disparoArriba.png"));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else if (direction == "down") {
+            try {
+                imageShoot = ImageIO.read(getClass().getResourceAsStream("/spritesjugador/disparoAbajo.png"));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else if (direction == "left") {
+            try {
+                imageShoot = ImageIO.read(getClass().getResourceAsStream("/spritesjugador/disparoIzquierda.png"));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else if (direction == "right") {
+            try {
+                imageShoot = ImageIO.read(getClass().getResourceAsStream("/spritesjugador/disparoDerecha.png"));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
     /*private void sendMessageMove() {
@@ -127,6 +224,17 @@ public class Player extends Entity {
         message.put("command", this.direction); // "up", "down", "left" o "right"
         connectionManager.queueMessage(message);
     }
+    public void actualShoot(){
+                // Actualizar cada disparo y eliminar los que están fuera de los límites del
+        // mundo
+        disparos.removeIf(disparo-> {
+                        // Eliminar disparo si sale de los límites del mundo, no de la pantalla
+
+            disparo.update();
+            return disparo.getX() < 0 || disparo.getX() > gP.getWidthScreen() || disparo.getY() < 0 || disparo.getY() > gP.getHeigthScreen();
+        });
+    }
+    
 
     public void sendStatus(Boolean isSpawn) {
         JSONObject message = new JSONObject();
@@ -138,8 +246,16 @@ public class Player extends Entity {
 
         connectionManager.queueMessage(message);
     }
+    public void restLife(){
+        if(numLives > 0){
+            numLives--;
+        }
+        if(numLives <= 0){
+            isAlive = false;
+            sendStatus(false);
+        }
+    }
 
-    @Override
     public void draw(Graphics2D g2) {
         BufferedImage sprite = null;
         switch (this.direction) {

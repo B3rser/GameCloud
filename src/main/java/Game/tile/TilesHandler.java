@@ -126,4 +126,24 @@ public class TilesHandler {
             }
         }
     }
+    public Tile [] getArrayTiles() {
+        return this.tilesArray;
+    }
+    public int getMapCodeTiles(int ren, int col) {
+        return this.tilesMapCodes[ren][col];
+    }
+    public int getMaxTiles() {
+        return this.maxTiles;
+    }
+    public void setMaxTiles(int maxTiles) {
+        this.maxTiles = maxTiles;
+    }
+    public void setArrayTiles(Tile[] tilesArray) {
+        this.tilesArray = tilesArray;
+    }
+
+    public int getCodigoMapaTiles(int renSuperior, int colIzquierda) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getCodigoMapaTiles'");
+    }
 }

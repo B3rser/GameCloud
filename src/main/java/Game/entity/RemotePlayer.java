@@ -51,7 +51,6 @@ public class RemotePlayer extends Entity {
         this.direction = direction;
     }
 
-    @Override
     public void draw(Graphics2D g2) {
         BufferedImage sprite = null;
         switch (this.direction) {
